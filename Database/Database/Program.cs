@@ -10,6 +10,8 @@ namespace Database
     {
         static void Main(string[] args)
         {
+            Console.Write("you are mongo gay\n");
+            Console.Read();
         }
     }
 }
