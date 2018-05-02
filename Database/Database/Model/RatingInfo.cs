@@ -4,12 +4,12 @@ using System.Runtime.Serialization;
 namespace Database.Model
 {
     [DataContract]
-    public class Rating
+    public class RatingInfo
     {
         [DataMember(Name = "_id")]
         public string UserId { get; set; }
 
-        [DataMember(Name = "drinkId")]
+        [DataMember(Name = "drinkid")]
         public Guid DrinkId { get; set; }
 
         [DataMember(Name = "rating")]
