@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Database.Model;
 using MongoDB.Driver;
+using MongoDB.Bson;
+using Newtonsoft.Json;
 
 namespace Database
 {
@@ -11,14 +10,13 @@ namespace Database
     {
         static void Main(string[] args)
         {
-            var client = new MongoClient("mongodb://root:<root>@dm556-shard-00-00-kjfjr.mongodb.net:27017,dm556-shard-00-01-kjfjr.mongodb.net:27017,dm556-shard-00-02-kjfjr.mongodb.net:27017/test?ssl=true&replicaSet=DM556-shard-0&authSource=admin");
+            var client = new MongoClient("mongodb://root:root@ds111410.mlab.com:11410/gintonic");
             var database = client.GetDatabase("gintonic");
 
-            //Console.Write(client.ListDatabases());
+            var collection = database.GetCollection<BsonDocument>("drinks");
 
-            Console.WriteLine(database.ListCollections());
+            var count = collection.Count(new BsonDocument());
 
-            Console.WriteLine("you are mongo gay");
             Console.Read();
         }
     }
