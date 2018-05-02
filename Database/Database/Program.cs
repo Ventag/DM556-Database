@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace Database
 {
@@ -12,7 +13,7 @@ namespace Database
         static void Main(string[] args)
         {
             var client = new MongoClient("mongodb://root:<root>@dm556-shard-00-00-kjfjr.mongodb.net:27017,dm556-shard-00-01-kjfjr.mongodb.net:27017,dm556-shard-00-02-kjfjr.mongodb.net:27017/test?ssl=true&replicaSet=DM556-shard-0&authSource=admin");
-            var database = client.GetDatabase("gintonic");
+            var database = client.GetDatabase("test");
 
             //Console.Write(client.ListDatabases());
 
