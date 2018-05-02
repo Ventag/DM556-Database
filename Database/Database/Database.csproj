@@ -72,8 +72,8 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Model\DrinkCombinations.cs" />
-    <Compile Include="Model\DrinkRatings.cs" />
+    <Compile Include="Model\DrinkInfo.cs" />
+    <Compile Include="Model\RatingInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

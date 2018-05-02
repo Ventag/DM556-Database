@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 namespace Database.Model
 {
     [DataContract]
-    public class DrinkRatings
+    public class Rating
     {
-        [DataMember(Name = "userId")]
+        [DataMember(Name = "_id")]
         public string UserId { get; set; }
 
         [DataMember(Name = "drinkId")]
@@ -24,8 +24,5 @@ namespace Database.Model
         [DataMember(Name = "unhelpfull")]
         public int Unhelpfull { get; set; }
 
-        public DrinkRatings()
-        {
-        }
     }
 }
