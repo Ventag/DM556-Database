@@ -1,6 +1,7 @@
 ﻿using System;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.Runtime.Serialization;
         
 namespace Database.Model
@@ -8,8 +9,9 @@ namespace Database.Model
     [DataContract]
     public class DrinkInfo
     {
+        //[BsonId]
         [DataMember(Name = "_id")]
-        public ObjectId Id { get; set; }
+        public string Id { get; set; }
 
         [DataMember(Name = "gin")]
         public string Gin { get; set; }

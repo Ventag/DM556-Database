@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Database.Model;
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -15,7 +16,11 @@ namespace Database
 
             var collection = database.GetCollection<BsonDocument>("drinks");
 
-            var count = collection.Count(new BsonDocument());
+            var document = collection.Find(new BsonDocument()).First();
+
+            Console.WriteLine(document.ToJson());
+
+            var drink = JsonConvert.DeserializeObject<DrinkInfo>(document.ToJson());
 
             Console.Read();
         }
