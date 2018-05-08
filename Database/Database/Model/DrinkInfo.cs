@@ -9,7 +9,6 @@ namespace Database.Model
     [DataContract]
     public class DrinkInfo
     {
-        //[BsonId]
         [DataMember(Name = "_id")]
         public string Id { get; set; }
 

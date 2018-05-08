@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Database.Model;
 using Database.Core;
 using MongoDB.Driver;
@@ -8,9 +9,9 @@ using Newtonsoft.Json;
 
 namespace Database
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var engine = new Database.Core.Engine();
             engine.init();
@@ -25,6 +26,8 @@ namespace Database
             test.Add("");
             test.Add("Johhny Walker");
             Console.Read();
+            var menu = new Menu();
+            menu.Show();
         }
     }
 }
