@@ -8,7 +8,7 @@ namespace Database.Model
     public class RatingInfo
     {
         [DataMember(Name = "_id")]
-        public ObjectId UserId { get; set; }
+        public string UserId { get; set; }
 
         [DataMember(Name = "drinkid")]
         public string DrinkId { get; set; }
