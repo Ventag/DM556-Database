@@ -11,10 +11,5 @@ namespace Database.Model
     {
         [DataMember(Name = "_id")]
         public string Id { get; set; }
-
-        public UserInfo()
-        {
-            
-        }
     }
 }

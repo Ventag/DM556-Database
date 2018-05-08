@@ -122,15 +122,15 @@ namespace Database.Core
         public async Task list_all(bool type)
         {
             var collection = type ? database.GetCollection<BsonDocument>("drinks") : database.GetCollection<BsonDocument>("ratings");
-            using (IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(new BsonDocument()))
+            using (var cursor = await collection.FindAsync(new BsonDocument()))
             {
                 print_info("listing all " + (type ? "drinks" : "ratings"));
                 while (await cursor.MoveNextAsync())
                 {
-                    IEnumerable<BsonDocument> batch = cursor.Current;
+                    var batch = cursor.Current;
                     foreach (BsonDocument document in batch)
                     {
-                        List<string> document_info = get_document_info(document, type);
+                        var document_info = get_document_info(document, type);
                         foreach (string s in document_info)
                             Console.WriteLine(s);
 
