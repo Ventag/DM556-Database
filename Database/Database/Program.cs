@@ -19,13 +19,16 @@ namespace Database
             engine.list_all(true);
             engine.list_all(false);
 
-            List<string> test = new List<string>;
-            test.Add("Simon");
-            test.Add("Johhny Walker");
-            test.Add("Red Label");
-            test.Add("");
-            test.Add("Johhny Walker");
+            var test = new List<string>
+            {
+                "Simon",
+                "Johhny Walker",
+                "Red Label",
+                "",
+                "Johhny Walker"
+            };
             Console.Read();
+
             var menu = new Menu();
             menu.Show();
         }
