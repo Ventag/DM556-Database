@@ -27,7 +27,7 @@ namespace Database
             Console.WriteLine("1. Login");
             Console.WriteLine("2. Create new user");
 
-            while (true)
+            /*while (true)
             {
                 int.TryParse(Console.ReadLine(), out var choice);
                 switch (choice)
@@ -42,7 +42,7 @@ namespace Database
                         Console.WriteLine("You have to choose a valid option.");
                         break;
                 }
-            }
+            }*/
         }
 
         private void CreateUser()
@@ -96,7 +96,7 @@ namespace Database
             Console.WriteLine("3. Create new gin, tonic or ganish combination");
             Console.WriteLine("4. Logout");
 
-            int.TryParse(Console.ReadLine(), out var chosenOption);
+            /*int.TryParse(Console.ReadLine(), out var chosenOption);
 
             switch (chosenOption)
             {
@@ -109,7 +109,7 @@ namespace Database
                 case 4:
                     Logout();
                     break;
-            }
+            }*/
         }
 
         private void Logout()

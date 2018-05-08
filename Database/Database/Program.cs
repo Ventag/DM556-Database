@@ -6,6 +6,7 @@ using Database.Core;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace Database
 {
@@ -13,24 +14,31 @@ namespace Database
     {
         public static void Main(string[] args)
         {
+            Start();
+        }
+
+        public static async Task Start()
+        {
             var engine = new Database.Core.Engine();
             engine.init();
 
             engine.list_all(true);
             engine.list_all(false);
 
-            var test = new List<string>
+            var hendrick = new List<string>
             {
-                "Simon",
-                "Johhny Walker",
-                "Red Label",
-                "",
-                "Johhny Walker"
+                "Daniel",
+                "Gordon's Dry",
+                "Schweppes",
+                "Cucumber",
+                "An iconic and luxurious combination"
             };
-            Console.Read();
+
+            await engine.insert(Engine.TABLE.DRINKS, hendrick);
 
             var menu = new Menu();
             menu.Show();
+            Console.Read();
         }
     }
 }

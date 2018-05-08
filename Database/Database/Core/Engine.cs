@@ -36,7 +36,7 @@ namespace Database.Core
                 print_error("couldn't connect to database");
         }
 
-        public async void insert(TABLE type, List<string> data)
+        public async Task insert(TABLE type, List<string> data)
         {
             print_info("inserting data into database");
             switch(type)
@@ -44,14 +44,22 @@ namespace Database.Core
                 case TABLE.DRINKS:
                     DrinkInfo drink = new DrinkInfo
                     {
-                        Id = data.ElementAt(0),
+                        UserId = data.ElementAt(0),
                         Gin = data.ElementAt(1),
                         Tonic = data.ElementAt(2),
                         Garnish = data.ElementAt(3),
-                        Description = data.ElementAt(4)
+                        Description = data.ElementAt(4),
+                        Id = data.ElementAt(1) + data.ElementAt(2) + data.ElementAt(3)
                     };
 
                     var drink_collection = database.GetCollection<DrinkInfo>("drinks");
+
+                    if (search(TABLE.DRINKS, drink.Id))
+                    {
+                        print_error("drink already exists");
+                        return;
+                    }
+
                     await drink_collection.InsertOneAsync(drink);
                     break;
 
@@ -71,6 +79,7 @@ namespace Database.Core
                     break;
 
                 case TABLE.USER:
+
                     break;
 
                 default:
@@ -110,7 +119,7 @@ namespace Database.Core
             return result;
         }
 
-        public async void list_all(bool type)
+        public async Task list_all(bool type)
         {
             var collection = type ? database.GetCollection<BsonDocument>("drinks") : database.GetCollection<BsonDocument>("ratings");
             using (IAsyncCursor<BsonDocument> cursor = await collection.FindAsync(new BsonDocument()))
@@ -131,14 +140,34 @@ namespace Database.Core
             }
         }
 
-        public async void list_one()
+        public async Task list_one()
         {
 
         }
 
-        public async void search(string[] keys)
+        public bool search(TABLE type, string key)
         {
+            switch (type)
+            {
+                case TABLE.DRINKS:
+                    var drink_collection = database.GetCollection<DrinkInfo>("drinks");
+                    if (drink_collection.Find(x => x.Id == key).Any())
+                        return true;
+                    
+                    break;
 
+                case TABLE.RATING:
+                    break;
+
+                case TABLE.USER:
+                    break;
+
+                default:
+                    print_error("OBI-WAN");
+                    break;
+            }
+
+            return false;
         }
 
         private void print_ok(string msg)
