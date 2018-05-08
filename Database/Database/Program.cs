@@ -36,6 +36,8 @@ namespace Database
 
             await engine.insert(Engine.TABLE.DRINKS, hendrick);
 
+            Console.Read();
+
             var menu = new Menu();
             menu.Show();
             Console.Read();
