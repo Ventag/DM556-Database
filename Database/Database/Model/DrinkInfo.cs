@@ -12,6 +12,9 @@ namespace Database.Model
         [DataMember(Name = "_id")]
         public string Id { get; set; }
 
+        [DataMember(Name = "userId")]
+        public string UserId { get; set; }
+
         [DataMember(Name = "gin")]
         public string Gin { get; set; }
 
