@@ -22,8 +22,8 @@ namespace Database
             var engine = new Database.Core.Engine();
             engine.init();
 
-            engine.list_all(true);
-            engine.list_all(false);
+            //engine.list_all(true);
+            //engine.list_all(false);
 
             var hendrick = new List<string>
             {
@@ -36,8 +36,11 @@ namespace Database
 
             await engine.insert(Engine.TABLE.DRINKS, hendrick);
 
-            Console.Write("");
-            Console.Read();
+            var daniel = new List<string>
+            {
+                "Daniel"
+            };
+            await engine.insert(Engine.TABLE.USER, daniel);
 
             var menu = new Menu();
             menu.Show();

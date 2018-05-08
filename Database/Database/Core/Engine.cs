@@ -59,8 +59,8 @@ namespace Database.Core
                         print_error("drink already exists");
                         return;
                     }
-
-                    await drink_collection.InsertOneAsync(drink);
+                    print_info("adding drink to database");
+                    drink_collection.InsertOneAsync(drink);
                     break;
 
                 case TABLE.RATING:
@@ -75,11 +75,25 @@ namespace Database.Core
                     };
                     
                     var rating_collection = database.GetCollection<RatingInfo>("ratings");
-                    await rating_collection.InsertOneAsync(rating);
+                    print_info("adding rating to database");
+                    rating_collection.InsertOneAsync(rating);
                     break;
 
                 case TABLE.USER:
+                    UserInfo user = new UserInfo
+                    {
+                        Id = data.ElementAt(0)
+                    };
 
+                    var user_collection = database.GetCollection<UserInfo>("users");
+                    if (search(TABLE.USER, user.Id))
+                    {
+                        print_error("user already exists");
+                        return;
+                    }
+
+                    print_info("adding user to database");
+                    user_collection.InsertOneAsync(user);
                     break;
 
                 default:
@@ -157,9 +171,16 @@ namespace Database.Core
                     break;
 
                 case TABLE.RATING:
+                    var rating_collection = database.GetCollection<UserInfo>("ratings");
+                    if (rating_collection.Find(x => x.Id == key).Any())
+                        return true;
                     break;
 
                 case TABLE.USER:
+                    var user_collection = database.GetCollection<UserInfo>("users");
+                    if (user_collection.Find(x => x.Id == key).Any())
+                        return true;
+
                     break;
 
                 default:
