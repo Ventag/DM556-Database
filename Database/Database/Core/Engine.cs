@@ -38,18 +38,36 @@ namespace Database.Core
 
         public async void insert(TABLE type, List<string> data)
         {
+            print_info("inserting data into database");
             switch(type)
             {
                 case TABLE.DRINKS:
-                    var info = new DrinkInfo();
-                    info.Id = data.ElementAt(0);
-                    info.Gin = data.ElementAt(1);
-                    info.Tonic = data.ElementAt(2);
-                    info.Garnish = data.ElementAt(3);
-                    info.Description = data.ElementAt(4);
+                    DrinkInfo drink = new DrinkInfo
+                    {
+                        Id = data.ElementAt(0),
+                        Gin = data.ElementAt(1),
+                        Tonic = data.ElementAt(2),
+                        Garnish = data.ElementAt(3),
+                        Description = data.ElementAt(4)
+                    };
+
+                    var drink_collection = database.GetCollection<DrinkInfo>("drinks");
+                    await drink_collection.InsertOneAsync(drink);
                     break;
 
                 case TABLE.RATING:
+                    RatingInfo rating = new RatingInfo
+                    {
+                        UserId = data.ElementAt(0),
+                        DrinkId = data.ElementAt(1),
+                        Rating = int.Parse(data.ElementAt(2)),
+                        Comment = data.ElementAt(3),
+                        Helpfull = int.Parse(data.ElementAt(4)),
+                        Unhelpfull = int.Parse(data.ElementAt(5))
+                    };
+                    
+                    var rating_collection = database.GetCollection<RatingInfo>("ratings");
+                    await rating_collection.InsertOneAsync(rating);
                     break;
 
                 case TABLE.USER:
