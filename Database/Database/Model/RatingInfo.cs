@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.Serialization;
-using MongoDB.Bson;
+﻿using System.Runtime.Serialization;
 
 namespace Database.Model
 {

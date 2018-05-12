@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Database.Model;
 using MongoDB.Driver;
@@ -19,7 +18,8 @@ namespace Database.Core
         {
             DRINKS,
             RATING,
-            USER
+            USER,
+            TEST
         };
 
         public void init()
@@ -102,9 +102,32 @@ namespace Database.Core
             }
         }
 
-        public async void delete()
+        public async void delete(TABLE type, List<string> keys)
         {
+            switch(type)
+            {
+                case TABLE.DRINKS:
+                    var drink_collection = database.GetCollection<DrinkInfo>("drinks");
+                    drink_collection.DeleteOne(x => x.Id == keys.ElementAt(0));
+                    print_info("deleted drink by id \"" + keys.ElementAt(0) + "\"");
+                    break;
 
+                case TABLE.RATING:
+                    var rating_collection = database.GetCollection<RatingInfo>("ratings");
+                    rating_collection.DeleteOne(x => x.UserId == keys.ElementAt(0) && x.DrinkId == keys.ElementAt(1));
+                    print_info("deleted rating for drinkid \"" + keys.ElementAt(1) + "\" by \"" + keys.ElementAt(0) + "\"");
+                    break;
+
+                case TABLE.USER:
+                    var user_collection = database.GetCollection<UserInfo>("users");
+                    user_collection.DeleteOne(x => x.Id == keys.ElementAt(0));
+                    print_info("deleted user \"" + keys.ElementAt(0) + "\"");
+                    break;
+
+                default:
+                    print_error("OBI-WAN");
+                    break;
+            }
         }
 
         private List<string> get_document_info(BsonDocument doc, bool type)
