@@ -54,18 +54,20 @@ namespace Database.Core
 
                     var drink_collection = database.GetCollection<DrinkInfo>("drinks");
 
-                    /*if (search(TABLE.DRINKS, drink.Id))
+                    if (search(TABLE.DRINKS, drink.Id).Count() > 0)
                     {
                         print_error("drink already exists");
                         return;
-                    }*/
+                    }
+
                     print_info("adding drink to database");
-                    drink_collection.InsertOneAsync(drink);
+                    drink_collection.InsertOne(drink);
                     break;
 
                 case TABLE.RATING:
                     RatingInfo rating = new RatingInfo
                     {
+                        Id = ObjectId.GenerateNewId(),
                         UserId = data.ElementAt(0),
                         DrinkId = data.ElementAt(1),
                         Rating = int.Parse(data.ElementAt(2)),
@@ -73,10 +75,23 @@ namespace Database.Core
                         Helpfull = int.Parse(data.ElementAt(4)),
                         Unhelpfull = int.Parse(data.ElementAt(5))
                     };
-                    
+
                     var rating_collection = database.GetCollection<RatingInfo>("ratings");
+                    var rating_result = search(TABLE.RATING, rating.UserId);
+            
+                    foreach(var r in rating_result)
+                    {
+                        var res = (RatingInfo)r;
+                        if(res.DrinkId == rating.DrinkId)
+                        {
+                            print_error("rating for drink by user already exists");
+                            return;
+                        }
+                    }
+
                     print_info("adding rating to database");
-                    rating_collection.InsertOneAsync(rating);
+             
+                    rating_collection.InsertOne(rating);
                     break;
 
                 case TABLE.USER:
@@ -86,14 +101,14 @@ namespace Database.Core
                     };
 
                     var user_collection = database.GetCollection<UserInfo>("users");
-                   /* if (search(TABLE.USER, user.Id))
+                    if(search(TABLE.USER, user.Id).Count() > 0)
                     {
                         print_error("user already exists");
                         return;
-                    }*/
+                    }
 
                     print_info("adding user to database");
-                    user_collection.InsertOneAsync(user);
+                    user_collection.InsertOne(user);
                     break;
 
                 default:
@@ -128,6 +143,23 @@ namespace Database.Core
                     print_error("OBI-WAN");
                     break;
             }
+        }
+
+        public async Task rate_helpfullness(string user, string drinkid, bool helpful)
+        {
+            var rating_collection = database.GetCollection<RatingInfo>("ratings");
+            var filter = Builders<RatingInfo>.Filter.Eq(s => s.UserId, user) & Builders<RatingInfo>.Filter.Eq(s => s.DrinkId, drinkid);
+            UpdateDefinition<RatingInfo> update = null;
+            if(helpful)
+                update = Builders<RatingInfo>.Update.Inc(s => s.Helpfull, 1);
+            else
+                update = Builders<RatingInfo>.Update.Inc(s => s.Unhelpfull, 1);
+            var result = rating_collection.UpdateOne(filter, update);
+            Console.WriteLine(result);
+            if (result.IsAcknowledged)
+                print_ok("helpful rating registered updated");
+            else
+                print_error("couldn't add helpfull rating");
         }
 
         private List<string> get_document_info(BsonDocument doc, bool type)
@@ -177,43 +209,68 @@ namespace Database.Core
             }
         }
 
-        public async Task list_one()
+        public async Task list_one(TABLE type, List<object> objects)
         {
+            switch(type)
+            {
+                case TABLE.DRINKS:
+                    foreach(var obj in objects)
+                    {
+                        var drink = (DrinkInfo)obj;
+                        Console.WriteLine(drink.UserId);
+                        Console.WriteLine(drink.Gin);
+                        Console.WriteLine(drink.Tonic);
+                        Console.WriteLine(drink.Garnish);
+                        Console.WriteLine(drink.Description);
+                    }
+                    break;
 
+                case TABLE.RATING:
+                    foreach (var obj in objects)
+                    {
+                        var rating = (RatingInfo)obj;
+                        Console.WriteLine(rating.UserId);
+                        Console.WriteLine(rating.DrinkId);
+                        Console.WriteLine(rating.Comment);
+                        Console.WriteLine(rating.Helpfull);
+                        Console.WriteLine(rating.Unhelpfull);
+                    }
+                    break;
+
+                case TABLE.USER:
+                    foreach (var obj in objects)
+                    {
+                        var user = (UserInfo)obj;
+                        Console.WriteLine(user.Id);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
 
-        public async void testfunc()
-        {/*
-            
-             
-            var filter = Builders<BsonDocument>.Filter.Eq("UserId", "user");
-            var result = rating_collection.Find(filter.ToBsonDocument());
-             */
-            var rating_collection = database.GetCollection<RatingInfo>("ratings");
-            
-            var res = await rating_collection.Find(x => x.Rating == 10).ToListAsync();
-
-            Console.WriteLine(res);
-        }
-
-        public string search(TABLE type, string key)
+        public List<object> search(TABLE type, string key)
         {
             switch (type)
             {
                 case TABLE.DRINKS:
                     var drink_collection = database.GetCollection<DrinkInfo>("drinks");
-                    //return drink_collection.Find(x => x.Id == key).FirstOrDefault<DrinkInfo>();
-                    return "";
+                    var drink_return = drink_collection.Find(x => x.Id == key).FirstOrDefault<DrinkInfo>();
+                    List<object> drink_list = new List<object>();
+                    drink_list.Add(drink_return);
+                    return drink_list;
 
                 case TABLE.RATING:
                     var rating_collection = database.GetCollection<RatingInfo>("ratings");
-                    return rating_collection.Find(x => x.UserId == key).ToJson();
+                    var rating_return = rating_collection.Find(x => x.UserId == key).ToList();
+                    return new List<object>(rating_return);
 
                 case TABLE.USER:
                     var user_collection = database.GetCollection<UserInfo>("users");
-                    if (user_collection.Find(x => x.Id == key).Any())
-                        return "";
-
+                    var user_return = user_collection.Find(x => x.Id == key).FirstOrDefault<UserInfo>();
+                    List<object> user_list = new List<object>();
+                    user_list.Add(user_return);
                     break;
 
                 default:
@@ -221,7 +278,7 @@ namespace Database.Core
                     break;
             }
 
-            return "";
+            return new List<object>();
         }
 
         private void print_ok(string msg)

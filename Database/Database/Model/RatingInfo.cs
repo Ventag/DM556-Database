@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using MongoDB.Bson;
 
 namespace Database.Model
 {
@@ -6,6 +7,9 @@ namespace Database.Model
     public class RatingInfo
     {
         [DataMember(Name = "_id")]
+        public ObjectId Id { get; set; }
+
+        [DataMember(Name = "userid")]
         public string UserId { get; set; }
 
         [DataMember(Name = "drinkid")]

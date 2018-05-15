@@ -22,16 +22,24 @@ namespace Database
             var engine = new Database.Core.Engine();
             engine.init();
 
-            //engine.list_all(true);
-            //engine.list_all(false);
+            List<string> data = new List<string>
+            {
+                "Daniel",
+                "Simon",
+                "0",
+                "He stupeed",
+                "1",
+                "-1"
+            };
 
+            await engine.insert(Engine.TABLE.RATING, data);
 
-            //var ratings = JsonConvert.DeserializeObject<RatingInfo>(engine.search(Engine.TABLE.RATING, "user"));
-
-            engine.testfunc();
-
-            var menu = new Menu();
-            menu.Show();
+            await engine.rate_helpfullness("Daniel1", "Simon", true);
+            //search(TABLE.RATING, rating.DrinkId).Count() > 0)
+            //await engine.list_one(Engine.TABLE.RATING, engine.search(Engine.TABLE.RATING, "user"));
+            
+            //var menu = new Menu();
+            //menu.Show();
             Console.Read();
         }
     }
