@@ -54,11 +54,11 @@ namespace Database.Core
 
                     var drink_collection = database.GetCollection<DrinkInfo>("drinks");
 
-                    if (search(TABLE.DRINKS, drink.Id))
+                    /*if (search(TABLE.DRINKS, drink.Id))
                     {
                         print_error("drink already exists");
                         return;
-                    }
+                    }*/
                     print_info("adding drink to database");
                     drink_collection.InsertOneAsync(drink);
                     break;
@@ -86,11 +86,11 @@ namespace Database.Core
                     };
 
                     var user_collection = database.GetCollection<UserInfo>("users");
-                    if (search(TABLE.USER, user.Id))
+                   /* if (search(TABLE.USER, user.Id))
                     {
                         print_error("user already exists");
                         return;
-                    }
+                    }*/
 
                     print_info("adding user to database");
                     user_collection.InsertOneAsync(user);
@@ -182,27 +182,37 @@ namespace Database.Core
 
         }
 
-        public bool search(TABLE type, string key)
+        public async void testfunc()
+        {/*
+            
+             
+            var filter = Builders<BsonDocument>.Filter.Eq("UserId", "user");
+            var result = rating_collection.Find(filter.ToBsonDocument());
+             */
+            var rating_collection = database.GetCollection<RatingInfo>("ratings");
+            
+            var res = await rating_collection.Find(x => x.Rating == 10).ToListAsync();
+
+            Console.WriteLine(res);
+        }
+
+        public string search(TABLE type, string key)
         {
             switch (type)
             {
                 case TABLE.DRINKS:
                     var drink_collection = database.GetCollection<DrinkInfo>("drinks");
-                    if (drink_collection.Find(x => x.Id == key).Any())
-                        return true;
-                    
-                    break;
+                    //return drink_collection.Find(x => x.Id == key).FirstOrDefault<DrinkInfo>();
+                    return "";
 
                 case TABLE.RATING:
-                    var rating_collection = database.GetCollection<UserInfo>("ratings");
-                    if (rating_collection.Find(x => x.Id == key).Any())
-                        return true;
-                    break;
+                    var rating_collection = database.GetCollection<RatingInfo>("ratings");
+                    return rating_collection.Find(x => x.UserId == key).ToJson();
 
                 case TABLE.USER:
                     var user_collection = database.GetCollection<UserInfo>("users");
                     if (user_collection.Find(x => x.Id == key).Any())
-                        return true;
+                        return "";
 
                     break;
 
@@ -211,7 +221,7 @@ namespace Database.Core
                     break;
             }
 
-            return false;
+            return "";
         }
 
         private void print_ok(string msg)

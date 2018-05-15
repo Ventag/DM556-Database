@@ -25,22 +25,10 @@ namespace Database
             //engine.list_all(true);
             //engine.list_all(false);
 
-            var hendrick = new List<string>
-            {
-                "Daniel",
-                "Gordon's Dry",
-                "Schweppes",
-                "Cucumber",
-                "An iconic and luxurious combination"
-            };
 
-            await engine.insert(Engine.TABLE.DRINKS, hendrick);
+            //var ratings = JsonConvert.DeserializeObject<RatingInfo>(engine.search(Engine.TABLE.RATING, "user"));
 
-            var daniel = new List<string>
-            {
-                "Daniel"
-            };
-            await engine.insert(Engine.TABLE.USER, daniel);
+            engine.testfunc();
 
             var menu = new Menu();
             menu.Show();
