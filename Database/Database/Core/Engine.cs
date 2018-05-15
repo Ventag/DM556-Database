@@ -155,11 +155,11 @@ namespace Database.Core
             else
                 update = Builders<RatingInfo>.Update.Inc(s => s.Unhelpfull, 1);
             var result = rating_collection.UpdateOne(filter, update);
-            Console.WriteLine(result);
-            if (result.IsAcknowledged)
-                print_ok("helpful rating registered updated");
+
+            if (result.ModifiedCount > 0)
+                print_ok("helpful rating registered");
             else
-                print_error("couldn't add helpfull rating");
+                print_error("couldn't register helpfull rating");
         }
 
         private List<string> get_document_info(BsonDocument doc, bool type)
