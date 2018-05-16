@@ -19,13 +19,15 @@ namespace Database
 
         public static async Task Start()
         {
-            var engine = new Database.Core.Engine();
+            var engine = new Engine();
             engine.init();
 
-            await engine.rate_helpfullness("Daniel1", "Simon", true);
+
+            //engine.list_one(Engine.TABLE.RATING, engine.search(Engine.TABLE.RATING, "Daniel"));
+            //engine.list_one(Engine.TABLE.USER, engine.search(Engine.TABLE.USER, "Daniel"));
             
-            var menu = new Menu();
-            menu.Show();
+            var menu = new Menu(engine);
+            menu.display();
             Console.Read();
         }
     }

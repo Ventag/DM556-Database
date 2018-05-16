@@ -6,10 +6,11 @@ using Database.Model;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Newtonsoft.Json;
+using MongoDB.Bson.Serialization;
 
 namespace Database.Core
 {
-    class Engine
+    public class Engine
     {
         static MongoClient client;
         static IMongoDatabase database;
@@ -72,8 +73,8 @@ namespace Database.Core
                         DrinkId = data.ElementAt(1),
                         Rating = int.Parse(data.ElementAt(2)),
                         Comment = data.ElementAt(3),
-                        Helpfull = int.Parse(data.ElementAt(4)),
-                        Unhelpfull = int.Parse(data.ElementAt(5))
+                        Helpfull = 0,
+                        Unhelpfull = 0
                     };
 
                     var rating_collection = database.GetCollection<RatingInfo>("ratings");
@@ -162,33 +163,7 @@ namespace Database.Core
                 print_error("couldn't register helpfull rating");
         }
 
-        private List<string> get_document_info(BsonDocument doc, bool type)
-        {
-            List<string> result = new List<string>();
-
-            if(type)
-            {
-                var info = JsonConvert.DeserializeObject<DrinkInfo>(doc.ToJson());
-                result.Add("Gin: " + info.Gin);
-                result.Add("Tonic: " + info.Tonic);
-                result.Add("Garnish: " + info.Garnish);
-                result.Add("Description: " + info.Description);
-            }
-            else
-            {
-                var info = JsonConvert.DeserializeObject<RatingInfo>(doc.ToJson());
-                result.Add("User: " + info.UserId);
-                result.Add("Drink ID: " + info.DrinkId);
-                result.Add("Rating: " + info.Rating);
-                result.Add("User comment: " + info.Comment);
-                result.Add("Helpful: " + info.Helpfull);
-                result.Add("Unhelpful: " + info.Unhelpfull);
-            }
-
-            return result;
-        }
-
-        public async Task list_all(bool type)
+        public async Task list_all_of_type(bool type)
         {
             var collection = type ? database.GetCollection<BsonDocument>("drinks") : database.GetCollection<BsonDocument>("ratings");
             using (var cursor = await collection.FindAsync(new BsonDocument()))
@@ -199,11 +174,25 @@ namespace Database.Core
                     var batch = cursor.Current;
                     foreach (BsonDocument document in batch)
                     {
-                        var document_info = get_document_info(document, type);
-                        foreach (string s in document_info)
-                            Console.WriteLine(s);
-
-                        Console.WriteLine();
+                        if (type)
+                        {
+                            var drink = (BsonSerializer.Deserialize<DrinkInfo>(document));
+                            Console.WriteLine(drink.UserId);
+                            Console.WriteLine(drink.Gin);
+                            Console.WriteLine(drink.Tonic);
+                            Console.WriteLine(drink.Garnish);
+                            Console.WriteLine(drink.Description);
+                        }
+                        else
+                        {
+                            var rating = (BsonSerializer.Deserialize<RatingInfo>(document));
+                            Console.WriteLine("user_id:   " + rating.UserId);
+                            Console.WriteLine("drink_id:  " + rating.DrinkId);
+                            Console.WriteLine("rating:    " + rating.Rating);
+                            Console.WriteLine("comment:   " + rating.Comment);
+                            Console.WriteLine("helpful:   " + rating.Helpfull);
+                            Console.WriteLine("unhelpful: " + rating.Unhelpfull);
+                        }
                     }
                 }
             }
@@ -256,10 +245,8 @@ namespace Database.Core
             {
                 case TABLE.DRINKS:
                     var drink_collection = database.GetCollection<DrinkInfo>("drinks");
-                    var drink_return = drink_collection.Find(x => x.Id == key).FirstOrDefault<DrinkInfo>();
-                    List<object> drink_list = new List<object>();
-                    drink_list.Add(drink_return);
-                    return drink_list;
+                    var drink_return = drink_collection.Find(x => x.Id == key).ToList();
+                    return new List<object>(drink_return);
 
                 case TABLE.RATING:
                     var rating_collection = database.GetCollection<RatingInfo>("ratings");
@@ -268,10 +255,8 @@ namespace Database.Core
 
                 case TABLE.USER:
                     var user_collection = database.GetCollection<UserInfo>("users");
-                    var user_return = user_collection.Find(x => x.Id == key).FirstOrDefault<UserInfo>();
-                    List<object> user_list = new List<object>();
-                    user_list.Add(user_return);
-                    break;
+                    var user_return = user_collection.Find(x => x.Id == key).ToList();
+                    return new List<object>(user_return);
 
                 default:
                     print_error("OBI-WAN");
