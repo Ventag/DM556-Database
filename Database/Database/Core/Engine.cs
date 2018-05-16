@@ -177,21 +177,23 @@ namespace Database.Core
                         if (type)
                         {
                             var drink = (BsonSerializer.Deserialize<DrinkInfo>(document));
-                            Console.WriteLine(drink.UserId);
-                            Console.WriteLine(drink.Gin);
-                            Console.WriteLine(drink.Tonic);
-                            Console.WriteLine(drink.Garnish);
-                            Console.WriteLine(drink.Description);
+                            Console.WriteLine(); 
+                            Console.WriteLine("User:        " + drink.UserId); 
+                            Console.WriteLine("Gin:         " + drink.Gin); 
+                            Console.WriteLine("Tonic:       " + drink.Tonic); 
+                            Console.WriteLine("Garnish:     " + drink.Garnish); 
+                            Console.WriteLine("Description: " + drink.Description); 
                         }
                         else
                         {
                             var rating = (BsonSerializer.Deserialize<RatingInfo>(document));
-                            Console.WriteLine("user_id:   " + rating.UserId);
-                            Console.WriteLine("drink_id:  " + rating.DrinkId);
-                            Console.WriteLine("rating:    " + rating.Rating);
-                            Console.WriteLine("comment:   " + rating.Comment);
-                            Console.WriteLine("helpful:   " + rating.Helpfull);
-                            Console.WriteLine("unhelpful: " + rating.Unhelpfull);
+                            Console.WriteLine(); 
+                            Console.WriteLine("User:      " + rating.UserId); 
+                            Console.WriteLine("DrinkID:   " + rating.DrinkId); 
+                            Console.WriteLine("Rating:    " + rating.Rating); 
+                            Console.WriteLine("Comment:   " + rating.Comment); 
+                            Console.WriteLine("Helpful:   " + rating.Helpfull); 
+                            Console.WriteLine("Unhelpful: " + rating.Unhelpfull); 
                         }
                     }
                 }
@@ -206,11 +208,12 @@ namespace Database.Core
                     foreach(var obj in objects)
                     {
                         var drink = (DrinkInfo)obj;
-                        Console.WriteLine(drink.UserId);
-                        Console.WriteLine(drink.Gin);
-                        Console.WriteLine(drink.Tonic);
-                        Console.WriteLine(drink.Garnish);
-                        Console.WriteLine(drink.Description);
+                        Console.WriteLine(); 
+                        Console.WriteLine("User:        " + drink.UserId); 
+                        Console.WriteLine("Gin:         " + drink.Gin); 
+                        Console.WriteLine("Tonic:       " + drink.Tonic); 
+                        Console.WriteLine("Garnish:     " + drink.Garnish); 
+                        Console.WriteLine("Description: " + drink.Description); 
                     }
                     break;
 
@@ -218,11 +221,12 @@ namespace Database.Core
                     foreach (var obj in objects)
                     {
                         var rating = (RatingInfo)obj;
-                        Console.WriteLine(rating.UserId);
-                        Console.WriteLine(rating.DrinkId);
-                        Console.WriteLine(rating.Comment);
-                        Console.WriteLine(rating.Helpfull);
-                        Console.WriteLine(rating.Unhelpfull);
+                        Console.WriteLine(); 
+                        Console.WriteLine("User:      " + rating.UserId); 
+                        Console.WriteLine("DrinkID:   " + rating.DrinkId); 
+                        Console.WriteLine("Comment:   " + rating.Comment); 
+                        Console.WriteLine("Helpful:   " + rating.Helpfull); 
+                        Console.WriteLine("Unhelpful: " + rating.Unhelpfull); 
                     }
                     break;
 
@@ -230,7 +234,8 @@ namespace Database.Core
                     foreach (var obj in objects)
                     {
                         var user = (UserInfo)obj;
-                        Console.WriteLine(user.Id);
+                        Console.WriteLine(); 
+                        Console.WriteLine("User: " + user.Id); 
                     }
                     break;
 
