@@ -21,10 +21,6 @@ namespace Database
         {
             var engine = new Engine();
             engine.init();
-
-
-            //engine.list_one(Engine.TABLE.RATING, engine.search(Engine.TABLE.RATING, "Daniel"));
-            //engine.list_one(Engine.TABLE.USER, engine.search(Engine.TABLE.USER, "Daniel"));
             
             var menu = new Menu(engine);
             menu.display();

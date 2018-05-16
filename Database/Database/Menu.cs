@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Database.Model;
 
 namespace Database
 {
@@ -86,6 +87,7 @@ namespace Database
         private void login()
         {
             reset();
+            header("root > login");
             options.Add("enter username");
             list_options();
            
@@ -112,6 +114,7 @@ namespace Database
         private async Task main_menu()
         {
             reset();
+            header("root > main");
             options.Add("create new drink");
             options.Add("rate a drink");
             options.Add("search");
@@ -133,6 +136,7 @@ namespace Database
                     rate_drink();
                     break;
                 case 3:
+                    search();
                     break;
                 case 4:
                     engine.list_all_of_type(false);
@@ -146,12 +150,15 @@ namespace Database
         private async Task create_drink()
         {
             reset();
-
+            header("root > main > create_drink");
             options.Add("enter a gin");
             list_options();
             string gin = Console.ReadLine();
             options.Clear();
 
+            if (gin == "0")
+                display();
+            
             options.Add("enter a tonic");
             list_options();
             string tonic = Console.ReadLine();
@@ -183,14 +190,18 @@ namespace Database
         private async Task rate_drink()
         {
             reset();
+            header("root > main > rate_drink");
             options.Add("enter drink-id that you wish to rate");
             list_options();
             string drink_id = Console.ReadLine();
 
+            if (drink_id == "0")
+                display();
+
             if (engine.search(Core.Engine.TABLE.DRINKS, drink_id).Count < 0)
             {
                 Console.WriteLine("drink does not exist");
-                sleep(500);
+                sleep(1000);
                 display();
             }
 
@@ -215,6 +226,49 @@ namespace Database
             data.Add(rating);
             data.Add(comment);
             engine.insert(Core.Engine.TABLE.RATING, data);
+        }
+
+        private async Task search()
+        {
+            reset();
+            header("root > main > search");
+
+            options.Add("enter type of ingredient (gin, tonic, garnish)");
+            list_options();
+            
+            string ingredient = Console.ReadLine();
+
+            if (ingredient == "0")
+                display();
+
+            List<string> whitelist = new List<string> { "gin", "tonic", "garnish"};
+            if (!whitelist.Contains(ingredient))
+                search();
+
+            options.Clear();
+            options.Add("enter an item to search for");
+            list_options();
+            input = Console.ReadLine();
+            
+            List<object> objects = engine.search(Core.Engine.TABLE.DRINKS, ingredient, input);
+
+            if (objects.Count < 1)
+            {
+                Console.WriteLine("\nno drinks found with the given ingredient");
+                Console.Read();
+                search();
+            }
+
+            Console.WriteLine("found [" + objects.Count + "] amount of drinks containing " + input);
+            Console.WriteLine("drink id's of drinks containing item listed below\n");
+
+            int counter = 1;
+            foreach (var o in objects)
+            {
+                var drink = (DrinkInfo)o;
+                Console.WriteLine("> " + counter + ": " + drink.Id);
+            }
+            Console.Read();
         }
 
         private void logout()
@@ -276,6 +330,14 @@ namespace Database
         private void sleep(int time)
         {
             System.Threading.Thread.Sleep(time);
+        }
+
+        private void header(string path)
+        {
+            Console.WriteLine("=============================================================");
+            Console.WriteLine("User: " + current_user);
+            Console.WriteLine("Path: " + path);
+            Console.WriteLine("=============================================================");
         }
     }
 }

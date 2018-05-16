@@ -266,6 +266,30 @@ namespace Database.Core
             return new List<object>();
         }
 
+        public List<object> search(TABLE type, string key, string subkey)
+        {
+            switch (type)
+            {
+                case TABLE.DRINKS:
+                    var drink_collection = database.GetCollection<DrinkInfo>("drinks");
+                    List<DrinkInfo> drink_return = null;
+
+                    if(key == "gin")
+                        drink_return = drink_collection.Find(x => x.Gin == subkey).ToList();
+                    else if(key == "tonic")
+                        drink_return = drink_collection.Find(x => x.Tonic == subkey).ToList();
+                    else if(key == "garnish")
+                        drink_return = drink_collection.Find(x => x.Garnish == subkey).ToList();
+                    return new List<object>(drink_return);
+
+                default:
+                    print_error("OBI-WAN");
+                    break;
+            }
+
+            return new List<object>();
+        }
+
         private void print_ok(string msg)
         {
             Console.Write("[");
