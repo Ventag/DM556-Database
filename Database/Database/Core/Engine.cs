@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Database.Model;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using System.Linq.Expressions;
+using System.Data.Linq;
 
 namespace Database.Core
 {
@@ -14,6 +14,7 @@ namespace Database.Core
     {
         static MongoClient client;
         static IMongoDatabase database;
+        static DataContext dc;
 
         public enum TABLE
         {
@@ -27,6 +28,8 @@ namespace Database.Core
         {
             client = new MongoClient("mongodb://root:root@ds111410.mlab.com:11410/gintonic");
             database = client.GetDatabase("gintonic");
+            dc = new DataContext("mongodb://root:root@ds111410.mlab.com:11410/gintonic");
+            dc.Log = Console.Out;
 
             var drinks = database.GetCollection<BsonDocument>("drinks");
 
@@ -44,13 +47,13 @@ namespace Database.Core
             switch(collection_name)
             {
                 case "drinks":
-                    print_sql_drink(data);
+                    print_sql_drink("ins", data);
                     break;
                 case "ratings":
-                    print_sql_rating(data);
+                    print_sql_rating("ins", data);
                     break;
                 case "users":
-                    print_sql_user(data);
+                    print_sql_user("ins", data);
                     break;
             }
 
@@ -58,10 +61,40 @@ namespace Database.Core
             print_info("INSERT " + data.GetType() + " INTO " + collection_name);
         }
 
-        public List<T> get_data<T>(string collection_name, Expression<Func<T, bool>> filter)
+        public async Task<List<T>> get_data<T>(string collection_name, Expression<Func<T, bool>> filter)
         {
             var collection = database.GetCollection<T>(collection_name);
+            switch (collection_name)
+            {
+                case "drinks":
+                    print_sql_drink("sel", filter);
+                    break;
+                case "ratings":
+                    print_sql_rating("sel", filter);
+                    break;
+                case "users":
+                    print_sql_user("sel", filter);
+                    break;
+            }
+
             return collection.Find(filter).ToList<T>();
+        }
+
+        public async Task rate_helpfullness(string ratingid, bool helpful)
+        {
+            var rating_collection = database.GetCollection<RatingInfo>("ratings");
+            var filter = Builders<RatingInfo>.Filter.Eq(s => s.Id, ratingid);
+            UpdateDefinition<RatingInfo> update = null;
+            if(helpful)
+                update = Builders<RatingInfo>.Update.Inc(s => s.Helpfull, 1);
+            else
+                update = Builders<RatingInfo>.Update.Inc(s => s.Unhelpfull, 1);
+            var result = rating_collection.UpdateOne(filter, update);
+
+            if (result.ModifiedCount > 0)
+                print_ok("helpful rating registered");
+            else
+                print_error("couldn't register helpfull rating");
         }
 
         public void print_ok(string msg)
@@ -94,22 +127,54 @@ namespace Database.Core
             Console.Write(msg + "\n");
         }
 
-        private void print_sql_drink(object data)
+        private void print_sql_drink(string tag, object data)
         {
             var d = data as DrinkInfo;
-            Console.WriteLine($"INSERT INTO drinks VALUES ('{d.Id}', '{d.UserId}', '{d.Gin}', '{d.Tonic}', '{d.Garnish}', '{d.Description}'");
+            switch (tag)
+            {
+                case "ins":
+                    print_info($"INSERT INTO drinks VALUES ('{d.Id}', '{d.UserId}', '{d.Gin}', '{d.Tonic}', '{d.Garnish}', '{d.Description}'");
+                    break;
+                case "sel":
+                    print_info($"SELECT FROM drinks WHERE '{data.ToString()}'");
+                    break;
+                default:
+                    print_info("wrong tag");
+                    break;
+            }
         }
 
-        private void print_sql_rating(object data)
+        private void print_sql_rating(string tag, object data)
         {
-            var d = data as RatingInfo;
-            Console.WriteLine($"INSERT INTO ratings VALUES ('{d.Id}', '{d.UserId}', '{d.DrinkId}', {d.Rating}, '{d.Comment}', '{d.Helpfull}', '{d.Unhelpfull}')");
+            var d = data as RatingInfo; switch (tag)
+            {
+                case "ins":
+                    print_info($"INSERT INTO ratings VALUES ('{d.Id}', '{d.UserId}', '{d.DrinkId}', {d.Rating}, '{d.Comment}', '{d.Helpfull}', '{d.Unhelpfull}')");
+                    break;
+                case "sel":
+                    print_info($"SELECT FROM ratings WHERE '{data.ToString()}'");
+                    break;
+                default:
+                    print_info("wrong tag");
+                    break;
+            }
         }
 
-        private void print_sql_user(object data)
+        private void print_sql_user(string tag, object data)
         {
             var d = data as UserInfo;
-            Console.WriteLine($"INSERT INTO users VALUES ('{d.Id}')");
+            switch (tag)
+            {
+                case "ins":
+                    print_info($"INSERT INTO users VALUES ('{d.Id}')");
+                    break;
+                case "sel":
+                    print_info($"SELECT FROM users WHERE '{data.ToString()}'");
+                    break;
+                default:
+                    print_info("wrong tag");
+                    break;
+            }
         }
     }
 }

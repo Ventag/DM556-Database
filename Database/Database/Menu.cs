@@ -23,7 +23,7 @@ namespace Database
             path.Add("main page");
         }
 
-       /* public async Task display()
+        public async Task display()
         {
             while(true)
             {
@@ -58,9 +58,9 @@ namespace Database
                 default:
                     break;
             }
-        }*/
+        }
 
-        /*private async Task create_user()
+        private async Task create_user()
         {
             reset();
             options.Add("enter new user");
@@ -76,9 +76,8 @@ namespace Database
                 System.Threading.Thread.Sleep(500);
                 create_user();
             }
-            List<string> data = new List<string>();
-            data.Add(input);
-            await engine.insert(Core.Engine.TABLE.USER, data);
+
+            await engine.insert_data<UserInfo>("users", new UserInfo {Id = input});
             Console.WriteLine("user \"{0}\" has been created", input);
             current_user = input;
             sleep(500);
@@ -121,6 +120,7 @@ namespace Database
             options.Add("list all ratings");
             options.Add("list my drinks");
             options.Add("list my ratings");
+            options.Add("list ratings for specific drink");
             list_options();
             input = Console.ReadLine();
 
@@ -146,6 +146,9 @@ namespace Database
                     break;
                 case 6:
                     list_my_ratings();
+                    break;
+                case 7:
+                    list_specific_drink_ratings();
                     break;
                 default:
                     break;
@@ -181,13 +184,23 @@ namespace Database
 
             Console.WriteLine("adding drink to database");
 
-            List<string> data = new List<string>();
+            /*List<string> data = new List<string>();
             data.Add(current_user);
             data.Add(gin);
             data.Add(tonic);
             data.Add(garnish);
-            data.Add(description);
-            await engine.insert(Core.Engine.TABLE.DRINKS, data);
+            data.Add(description);*/
+            DrinkInfo data = new DrinkInfo
+            {
+                Id = gin + tonic + garnish,
+                UserId = current_user,
+                Gin = gin,
+                Tonic = tonic,
+                Garnish = garnish,
+                Description = description
+            };
+            //await engine.insert(Core.Engine.TABLE.DRINKS, data);
+            await engine.insert_data<DrinkInfo>("drinks", data);
 
             sleep(500);
         }
@@ -202,8 +215,8 @@ namespace Database
 
             if (drink_id == "0")
                 display();
-
-            if (engine.search(Core.Engine.TABLE.DRINKS, drink_id).Count < 0)
+            
+            if(engine.get_data<DrinkInfo>("drinks", t => t.Id == drink_id).Result.Count < 0)
             {
                 Console.WriteLine("drink does not exist");
                 sleep(1000);
@@ -224,13 +237,19 @@ namespace Database
             list_options();
             string comment = Console.ReadLine();
             options.Clear();
+            
+            RatingInfo data = new RatingInfo
+            {
+                Id = current_user + drink_id,
+                UserId = current_user,
+                DrinkId = drink_id,
+                Rating = int.Parse(rating),
+                Comment = comment,
+                Helpfull = 0,
+                Unhelpfull = 0
+            };
 
-            List<string> data = new List<string>();
-            data.Add(current_user);
-            data.Add(drink_id);
-            data.Add(rating);
-            data.Add(comment);
-            engine.insert(Core.Engine.TABLE.RATING, data);
+            engine.insert_data<RatingInfo>("ratings", data);
         }
 
         private async Task search()
@@ -238,7 +257,7 @@ namespace Database
             reset();
             header("root > main > search");
 
-            options.Add("enter type of ingredient (gin, tonic, garnish)");
+            options.Add("enter an ingredient (gin, tonic, garnish)");
             list_options();
             
             string ingredient = Console.ReadLine();
@@ -246,16 +265,7 @@ namespace Database
             if (ingredient == "0")
                 display();
 
-            List<string> whitelist = new List<string> { "gin", "tonic", "garnish"};
-            if (!whitelist.Contains(ingredient))
-                search();
-
-            options.Clear();
-            options.Add("enter an item to search for");
-            list_options();
-            input = Console.ReadLine();
-            
-            List<object> objects = engine.search(Core.Engine.TABLE.DRINKS, ingredient, input);
+            List<DrinkInfo> objects = engine.get_data<DrinkInfo>("drinks", t => (t.Gin == ingredient || t.Tonic == ingredient || t.Garnish == ingredient)).Result;//engine.search(Core.Engine.TABLE.DRINKS, ingredient, input);
 
             if (objects.Count < 1)
             {
@@ -280,7 +290,7 @@ namespace Database
         {
             reset();
             header("root > main > list_all_ratings");
-            var ratings = engine.get_all_ratings();
+            var ratings = engine.get_data<RatingInfo>("ratings", t => true).Result;
             ratings.Sort(delegate (RatingInfo x, RatingInfo y)
             {
                 return y.Helpfull.CompareTo(x.Helpfull);
@@ -339,15 +349,15 @@ namespace Database
                 list_all_ratings();
             }
 
-            engine.rate_helpfullness(ratings[drink - 1].UserId, ratings[drink - 1].DrinkId, input == "h" ? true : false);
-
+            //engine.rate_helpfullness(ratings[drink - 1].UserId, ratings[drink - 1].DrinkId, input == "h" ? true : false);
+            engine.rate_helpfullness(ratings[drink - 1].Id, input == "h" ? true : false);
             sleep(500);
         }
 
         private async Task list_my_drinks()
         {
             reset();
-            var objects = engine.search(Core.Engine.TABLE.DRINKS, "user", current_user);
+            var objects = engine.get_data<DrinkInfo>("drinks", t => t.UserId == current_user).Result;//engine.search(Core.Engine.TABLE.DRINKS, "user", current_user);
             header("root > main > list_my_drinks");
 
             if (objects.Count < 1)
@@ -359,12 +369,11 @@ namespace Database
 
             foreach (var o in objects)
             {
-                var drink = (DrinkInfo)o;
                 Console.WriteLine("");
-                Console.WriteLine("drink id: " + drink.Id);
-                Console.WriteLine("gin:      " + drink.Gin);
-                Console.WriteLine("tonic:    " + drink.Tonic);
-                Console.WriteLine("garnish:  " + drink.Garnish);
+                Console.WriteLine("drink id: " + o.Id);
+                Console.WriteLine("gin:      " + o.Gin);
+                Console.WriteLine("tonic:    " + o.Tonic);
+                Console.WriteLine("garnish:  " + o.Garnish);
             }
             
             Console.Read();
@@ -373,8 +382,9 @@ namespace Database
         private async Task list_my_ratings()
         {
             reset();
-            var objects = engine.search(Core.Engine.TABLE.RATING, current_user);
+            //engine.search(Core.Engine.TABLE.RATING, current_user);
             header("root > main > list_my_ratings");
+            var objects = engine.get_data<RatingInfo>("ratings", t => t.UserId == current_user).Result;
 
             if (objects.Count < 1)
             {
@@ -385,13 +395,54 @@ namespace Database
 
             foreach (var o in objects)
             {
-                var rating = (RatingInfo)o;
                 Console.WriteLine("");
-                Console.WriteLine("drink id: " + rating.DrinkId);
-                Console.WriteLine("rating:   " + rating.Rating);
-                Console.WriteLine("helpful:  " + rating.Helpfull);
-                Console.WriteLine("garnish:  " + rating.Unhelpfull);
+                Console.WriteLine("drink id: " + o.DrinkId);
+                Console.WriteLine("rating:   " + o.Rating);
+                Console.WriteLine("helpful:  " + o.Helpfull);
+                Console.WriteLine("garnish:  " + o.Unhelpfull);
             }
+
+            Console.Read();
+        }
+
+        private async Task list_specific_drink_ratings()
+        {
+            reset();
+            header("root > main > list_specific_drink_ratings");
+
+            options.Add("enter a drinkid to retrieve a list of ratings");
+            list_options();
+            input = Console.ReadLine();
+
+            var objects = engine.get_data<RatingInfo>("ratings", t => t.DrinkId == input).Result;
+
+            if (objects.Count < 1)
+            {
+                engine.print_info("there are no ratings for that drink");
+                Console.Read();
+                display();
+            }
+
+            int counter = 0;
+            int total_rating = 0;
+            foreach (var o in objects)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("user:     " + o.UserId);
+                Console.WriteLine("drink id: " + o.DrinkId);
+                Console.WriteLine("rating:   " + o.Rating);
+                Console.WriteLine("comment:  " + o.Comment);
+                Console.WriteLine("helpful:  " + o.Helpfull);
+                Console.WriteLine("garnish:  " + o.Unhelpfull);
+                total_rating += o.Rating;
+                counter++;
+            }
+
+            int average_rating = total_rating / counter;
+
+            Console.WriteLine();
+            Console.WriteLine("Total ratings:  " + counter);
+            Console.WriteLine("Average rating: " + average_rating);
 
             Console.Read();
         }
@@ -437,11 +488,12 @@ namespace Database
 
         private bool does_user_exist(string user)
         {
-            if (engine.search(Core.Engine.TABLE.USER, user).Count > 0)
+            //if (engine.search(Core.Engine.TABLE.USER, user).Count > 0)
+            if(engine.get_data<UserInfo>("users", t => t.Id == user).Result.Count > 0)
                 return true;
 
             return false;
-        }*/
+        }
 
         private void reset()
         {
