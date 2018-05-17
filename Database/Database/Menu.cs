@@ -23,7 +23,7 @@ namespace Database
             path.Add("main page");
         }
 
-        public async Task display()
+       /* public async Task display()
         {
             while(true)
             {
@@ -58,9 +58,9 @@ namespace Database
                 default:
                     break;
             }
-        }
+        }*/
 
-        private async Task create_user()
+        /*private async Task create_user()
         {
             reset();
             options.Add("enter new user");
@@ -441,7 +441,7 @@ namespace Database
                 return true;
 
             return false;
-        }
+        }*/
 
         private void reset()
         {
