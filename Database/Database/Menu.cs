@@ -139,8 +139,13 @@ namespace Database
                     search();
                     break;
                 case 4:
-                    engine.list_all_of_type(false);
-                    Console.Read();
+                    list_all_ratings();
+                    break;
+                case 5:
+                    list_my_drinks();
+                    break;
+                case 6:
+                    list_my_ratings();
                     break;
                 default:
                     break;
@@ -268,6 +273,126 @@ namespace Database
                 var drink = (DrinkInfo)o;
                 Console.WriteLine("> " + counter + ": " + drink.Id);
             }
+            Console.Read();
+        }
+
+        private async Task list_all_ratings()
+        {
+            reset();
+            header("root > main > list_all_ratings");
+            var ratings = engine.get_all_ratings();
+            ratings.Sort(delegate (RatingInfo x, RatingInfo y)
+            {
+                return y.Helpfull.CompareTo(x.Helpfull);
+            });
+
+            if(ratings.Count < 1)
+            {
+                engine.print_info("there are no ratings");
+                Console.Read();
+                display();
+            }
+
+            int counter = 1;
+            foreach(var rating in ratings)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("rating number: " + counter);
+                Console.WriteLine("user:      " + rating.UserId);
+                Console.WriteLine("drink id:  " + rating.DrinkId);
+                Console.WriteLine("rating:    " + rating.Rating);
+                Console.WriteLine("comment:   " + rating.Comment);
+                Console.WriteLine("helpful:   " + rating.Helpfull);
+                Console.WriteLine("unhelpful: " + rating.Unhelpfull);
+                counter++;
+            }
+
+            options.Add("enter a rating number to rate a drink");
+            list_options();
+
+            int drink = int.Parse(Console.ReadLine());
+
+            if (drink == 0)
+            {
+                display();
+                return;
+            }
+
+            if(drink > counter)
+            {
+                engine.print_error("that rating number does not exist, click any key to return");
+                Console.Read();
+                list_all_ratings();
+            }
+
+            options.Clear();
+            options.Add("type h to rate it helpful, or u for unhelpful");
+            list_options();
+
+            input = Console.ReadLine().ToLower();
+            List<string> whitelist = new List<string> { "h", "u"};
+
+            if(!whitelist.Contains(input))
+            {
+                engine.print_error("input not understood, click any key to return");
+                Console.Read();
+                list_all_ratings();
+            }
+
+            engine.rate_helpfullness(ratings[drink - 1].UserId, ratings[drink - 1].DrinkId, input == "h" ? true : false);
+
+            sleep(500);
+        }
+
+        private async Task list_my_drinks()
+        {
+            reset();
+            var objects = engine.search(Core.Engine.TABLE.DRINKS, current_user);
+            header("root > main > list_my_drinks");
+
+            if (objects.Count < 1)
+            {
+                engine.print_info("user has no registered drinks");
+                Console.Read();
+                display();
+            }
+
+            foreach (var o in objects)
+            {
+                var drink = (DrinkInfo)o;
+                Console.WriteLine("");
+                Console.WriteLine("drink id: " + drink.Id);
+                Console.WriteLine("gin:      " + drink.Gin);
+                Console.WriteLine("tonic:    " + drink.Tonic);
+                Console.WriteLine("garnish:  " + drink.Garnish);
+            }
+            
+            Console.Read();
+        }
+
+        private async Task list_my_ratings()
+        {
+            reset();
+            var objects = engine.search(Core.Engine.TABLE.RATING, current_user);
+            header("root > main > list_my_ratings");
+
+            if (objects.Count < 1)
+            {
+                engine.print_info("user has no registered ratings");
+                Console.Read();
+                display();
+            }
+
+            foreach (var o in objects)
+            {
+                var rating = (RatingInfo)o;
+                Console.WriteLine("");
+                Console.WriteLine("drink id: " + rating.Id);
+                Console.WriteLine("rating:   " + rating.Rating);
+                Console.WriteLine("helpful:  " + rating.Helpfull);
+                Console.WriteLine("garnish:  " + rating.Unhelpfull);
+            }
+
             Console.Read();
         }
 

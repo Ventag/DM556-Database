@@ -200,7 +200,7 @@ namespace Database.Core
             }
         }
 
-        public async Task list_one(TABLE type, List<object> objects)
+        public async Task list_one_type(TABLE type, List<object> objects)
         {
             switch(type)
             {
@@ -295,7 +295,14 @@ namespace Database.Core
             return new List<object>();
         }
 
-        private void print_ok(string msg)
+        public List<RatingInfo> get_all_ratings()
+        {
+            var rating_collection = database.GetCollection<RatingInfo>("ratings");
+            var rating_return = rating_collection.Find(_ => true).ToList();
+            return new List<RatingInfo>(rating_return);
+        }
+
+        public void print_ok(string msg)
         {
             Console.Write("[");
             Console.ForegroundColor = ConsoleColor.Green;
@@ -305,7 +312,7 @@ namespace Database.Core
             Console.Write(msg + "\n");
         }
 
-        private void print_info(string msg)
+        public void print_info(string msg)
         {
             Console.Write("[");
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -315,7 +322,7 @@ namespace Database.Core
             Console.Write(msg + "\n");
         }
 
-        private void print_error(string msg)
+        public void print_error(string msg)
         {
             Console.Write("[");
             Console.ForegroundColor = ConsoleColor.Red;
