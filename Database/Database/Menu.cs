@@ -347,7 +347,7 @@ namespace Database
         private async Task list_my_drinks()
         {
             reset();
-            var objects = engine.search(Core.Engine.TABLE.DRINKS, current_user);
+            var objects = engine.search(Core.Engine.TABLE.DRINKS, "user", current_user);
             header("root > main > list_my_drinks");
 
             if (objects.Count < 1)
@@ -387,7 +387,7 @@ namespace Database
             {
                 var rating = (RatingInfo)o;
                 Console.WriteLine("");
-                Console.WriteLine("drink id: " + rating.Id);
+                Console.WriteLine("drink id: " + rating.DrinkId);
                 Console.WriteLine("rating:   " + rating.Rating);
                 Console.WriteLine("helpful:  " + rating.Helpfull);
                 Console.WriteLine("garnish:  " + rating.Unhelpfull);

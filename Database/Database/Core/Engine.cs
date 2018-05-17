@@ -279,12 +279,14 @@ namespace Database.Core
                     var drink_collection = database.GetCollection<DrinkInfo>("drinks");
                     List<DrinkInfo> drink_return = null;
 
-                    if(key == "gin")
+                    if (key == "gin")
                         drink_return = drink_collection.Find(x => x.Gin == subkey).ToList();
-                    else if(key == "tonic")
+                    else if (key == "tonic")
                         drink_return = drink_collection.Find(x => x.Tonic == subkey).ToList();
-                    else if(key == "garnish")
+                    else if (key == "garnish")
                         drink_return = drink_collection.Find(x => x.Garnish == subkey).ToList();
+                    else if (key == "user")
+                        drink_return = drink_collection.Find(x => x.UserId == subkey).ToList();
                     return new List<object>(drink_return);
 
                 default:
