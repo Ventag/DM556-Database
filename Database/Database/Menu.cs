@@ -415,6 +415,11 @@ namespace Database
             input = Console.ReadLine();
 
             var objects = engine.get_data<RatingInfo>("ratings", t => t.DrinkId == input).Result;
+            if(input == "0")
+            {
+                display();
+                return;
+            }
 
             if (objects.Count < 1)
             {
