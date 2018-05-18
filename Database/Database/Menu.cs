@@ -184,12 +184,6 @@ namespace Database
 
             Console.WriteLine("adding drink to database");
 
-            /*List<string> data = new List<string>();
-            data.Add(current_user);
-            data.Add(gin);
-            data.Add(tonic);
-            data.Add(garnish);
-            data.Add(description);*/
             DrinkInfo data = new DrinkInfo
             {
                 Id = gin + tonic + garnish,
@@ -199,7 +193,6 @@ namespace Database
                 Garnish = garnish,
                 Description = description
             };
-            //await engine.insert(Core.Engine.TABLE.DRINKS, data);
             await engine.insert_data<DrinkInfo>("drinks", data);
 
             sleep(500);
@@ -348,8 +341,7 @@ namespace Database
                 Console.Read();
                 list_all_ratings();
             }
-
-            //engine.rate_helpfullness(ratings[drink - 1].UserId, ratings[drink - 1].DrinkId, input == "h" ? true : false);
+            
             engine.rate_helpfullness(ratings[drink - 1].Id, input == "h" ? true : false);
             sleep(500);
         }
@@ -357,7 +349,7 @@ namespace Database
         private async Task list_my_drinks()
         {
             reset();
-            var objects = engine.get_data<DrinkInfo>("drinks", t => t.UserId == current_user).Result;//engine.search(Core.Engine.TABLE.DRINKS, "user", current_user);
+            var objects = engine.get_data<DrinkInfo>("drinks", t => t.UserId == current_user).Result;
             header("root > main > list_my_drinks");
 
             if (objects.Count < 1)
@@ -382,7 +374,6 @@ namespace Database
         private async Task list_my_ratings()
         {
             reset();
-            //engine.search(Core.Engine.TABLE.RATING, current_user);
             header("root > main > list_my_ratings");
             var objects = engine.get_data<RatingInfo>("ratings", t => t.UserId == current_user).Result;
 
@@ -493,7 +484,6 @@ namespace Database
 
         private bool does_user_exist(string user)
         {
-            //if (engine.search(Core.Engine.TABLE.USER, user).Count > 0)
             if(engine.get_data<UserInfo>("users", t => t.Id == user).Result.Count > 0)
                 return true;
 
