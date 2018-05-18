@@ -14,7 +14,6 @@ namespace Database.Core
     {
         static MongoClient client;
         static IMongoDatabase database;
-        static DataContext dc;
 
         public enum TABLE
         {
@@ -28,8 +27,6 @@ namespace Database.Core
         {
             client = new MongoClient("mongodb://root:root@ds111410.mlab.com:11410/gintonic");
             database = client.GetDatabase("gintonic");
-            dc = new DataContext("mongodb://root:root@ds111410.mlab.com:11410/gintonic");
-            dc.Log = Console.Out;
 
             var drinks = database.GetCollection<BsonDocument>("drinks");
 
