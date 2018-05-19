@@ -1,7 +1,7 @@
 # DM556-Database
 Database project for DM556
 
-Ez to run with Visual Studio
+Run with Visual Studio on windows.
 
 If on mac. Download mono
 
